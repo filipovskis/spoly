@@ -30,7 +30,7 @@ local materials = spoly.materials
 
 local SIZE = 2048
 -- MATERIAL_RT_DEPTH_SEPARATE makes stencils possible to work
-local RT = GetRenderTargetEx ('spoly_rt2', SIZE, SIZE, 0, MATERIAL_RT_DEPTH_SEPARATE, bit.band(16, 1024), 0, IMAGE_FORMAT_DEFAULT)
+local RT = GetRenderTargetEx ('spoly_rt', SIZE, SIZE, 0, MATERIAL_RT_DEPTH_SEPARATE, bit.band(16, 1024), 0, IMAGE_FORMAT_DEFAULT)
 local CAPTURE_DATA = {
     x = 0,
     y = 0,
@@ -110,12 +110,14 @@ end
 Sometimes materials cannot be overriden, so change the name if you want to edit it's content
 --------------------------------]]
 --[[
+    -- Example with Circles.lua (https://github.com/SneakySquid/Circles)
+
     spoly.DrawCircle = spoly.Generate('circle', function(w, h)
         local x0, y0 = w * .5, h * .5
         local radius = h * .5
         local circle = Circles.New(CIRCLE_FILLED, radius, x0, y0)
         
-        poly()
+        circle()
     end)
 
     spoly.DrawOutlinedCircle = spoly.Generate('circle_outline_256', function(w, h)
