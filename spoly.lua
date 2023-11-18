@@ -158,6 +158,7 @@ do
     -- calling this really often so trying to optimize as much as possible
     function spoly.Draw(id, x, y, w, h, color)
         local material = materials[id]
+        if (not material) then return end
     
         if (color) then
             SetDrawColor(color)
