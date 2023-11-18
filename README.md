@@ -1,6 +1,8 @@
 # 🖌 spoly
 A tiny Garry's Mod library that allows you to render different shapes without jagged edges.
 
+Not only your shapes will look better, but the performance will increase, since basically you render an icon instead of rendering high polygon shapes.
+
 ## Example
 Smooth shapes for [Circles.lua](https://github.com/SneakySquid/Circles)
 
@@ -55,6 +57,8 @@ end)
 ```
 
 ## Demonstration
-The white circles are rendered through the lib.
+The white shapes are drawn using the library.
+The red ones are drawn by the default method `surface.DrawPoly`.
 
 ![Image](https://i.imgur.com/PF3PdNi.png)
+![Image 2](https://i.imgur.com/f6XMm7G.png)
