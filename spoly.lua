@@ -177,6 +177,7 @@ do
 
     function spoly.DrawRotated(id, x, y, w, h, rotation, color)
         local material = materials[id]
+        if (not material) then return end
     
         if (color) then
             SetDrawColor(color)
