@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --]]
 
-
 local STATUS_IDLE = 0
 local STATUS_BUSY = 1
 
@@ -103,10 +102,6 @@ function spoly.Render(id, funcDraw)
     else
         spoly.Print('Rendered \'%s\' in %ss', id, delta)
     end
-
-    return function(x, y, w, h, color)
-        spoly.Draw(id, x, y, w, h, color)
-    end
 end
 
 function spoly.Generate(id, funcDraw)
@@ -119,7 +114,9 @@ function spoly.Generate(id, funcDraw)
     local path = 'spoly/' .. id .. '.png'
     if (file.Exists(path, 'DATA')) then
         materials[id] = Material('data/' .. path, 'mips')
-        return
+        if (not materials[id]:IsError()) then
+            return
+        end
     end
 
     queued[id] = true
@@ -194,58 +191,3 @@ do
         PopFilterMin()
     end
 end
-
---[[------------------------------
-Sometimes materials cannot be overriden, so change the name if you want to edit it's content
---------------------------------]]
---[[
-    -- Example with Circles.lua (https://github.com/SneakySquid/Circles)
-
-    spoly.DrawCircle = spoly.Generate('circle', function(w, h)
-        local x0, y0 = w * .5, h * .5
-        local radius = h * .5
-        local circle = Circles.New(CIRCLE_FILLED, radius, x0, y0)
-        
-        circle()
-    end)
-
-    spoly.DrawOutlinedCircle = spoly.Generate('circle_outline_256', function(w, h)
-        local x0, y0 = w * .5, h * .5
-        local radius = h * .5
-        local thickness = 256
-        local circle = Circles.New(CIRCLE_OUTLINED, radius, x0, y0, thickness)
-        
-        circle()
-    end)
-
-    hook.Add('HUDPaint', 'Test', function()
-        surface.SetDrawColor(color_white)
-
-        local y = 512
-        local x = 512
-        local space = ScreenScale(1)
-
-        local amount = 8
-        local multiplier = 16
-        local maxSize = multiplier * amount
-
-        for i = 1, amount do
-            local size = multiplier * i
-
-            spoly.DrawOutlinedCircle(x, y + maxSize * .5 - size * .5, size, size)
-
-            x = x + size + space
-        end
-
-        y = y + maxSize + (space * 10)
-        x = 512
-
-        for i = 1, amount do
-            local size = multiplier * i
-
-            spoly.DrawCircle(x, y + maxSize * .5 - size * .5, size, size)
-
-            x = x + size + space
-        end
-    end)
-]]
