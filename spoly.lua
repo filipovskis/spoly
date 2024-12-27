@@ -69,6 +69,7 @@ Idk what shader parameter is missing, I couldn't find it even by comparing mater
 --------------------------------]]
 function spoly.Render(id, funcDraw)
     local path = 'spoly/' .. id .. '.png'
+    local tmpPath = SPOLY_DIR .. '/' .. util.SHA256(SysTime() .. path) .. '.png'
     local start = SysTime()
 
     spoly.status = STATUS_BUSY
@@ -91,12 +92,20 @@ function spoly.Render(id, funcDraw)
 
         local content = render.Capture(capture_data)
 
-        file.Delete(path)
-        file.Write(path, content)
+        file.Delete(tmpPath)
+        file.Write(tmpPath, content)
 
     render.PopRenderTarget()
 
-    materials[id] = Material('data/' .. path, 'mips')
+    -- gmod refuses to load the material from the file if it was an error before (till you disconnect/map changes)
+    -- so we use a temporary file to check if it's valid, this is only useful when your developing
+    materials[id] = Material('data/' .. tmpPath, 'mips')
+    if (materials[id]:IsError()) then
+        materials[id] = nil
+        file.Delete(tmpPath)
+    else
+        file.Rename(tmpPath, path)
+    end
 
     spoly.status = STATUS_IDLE
 
