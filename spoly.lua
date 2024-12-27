@@ -84,7 +84,12 @@ function spoly.Render(id, funcDraw)
             local success, errorText = pcall(funcDraw, SIZE, SIZE)
         cam.End2D()
 
-        local content = render.Capture(CAPTURE_DATA)
+        local capture_data = CAPTURE_DATA
+        if success and errorText then
+            capture_data = errorText
+        end
+
+        local content = render.Capture(capture_data)
 
         file.Delete(path)
         file.Write(path, content)
