@@ -74,9 +74,9 @@ function spoly.Render(id, funcDraw)
     spoly.status = STATUS_BUSY
 
     render.PushRenderTarget(RT)
-    
+
         render.Clear(0, 0, 0, 0)
-        
+
         cam.Start2D()
             surface.SetDrawColor(color_white)
             draw.NoTexture()
@@ -87,7 +87,7 @@ function spoly.Render(id, funcDraw)
 
         file.Delete(path)
         file.Write(path, content)
-    
+
     render.PopRenderTarget()
 
     materials[id] = Material('data/' .. path, 'mips')
@@ -107,7 +107,7 @@ end
 function spoly.Generate(id, funcDraw)
     assert(isstring(id), Format('bad argument #1 to \'spoly.Generate\' (expected string, got %s)', type(id)))
     assert(isfunction(funcDraw), Format('bad argument #2 to \'spoly.Generate\' (expected function, got %s)', type(funcDraw)))
-    
+
     if (materials[id]) then return end
     if (queued[id]) then return end
 
@@ -133,9 +133,9 @@ do
     hook.Add('Think', 'spoly.QueueController', function()
         if (spoly.status == STATUS_IDLE and queue[1] and nextThink <= CurTime()) then
             nextThink = CurTime() + thinkRate
-    
+
             local data = table.remove(queue, 1)
-    
+
             spoly.Render(data.id, data.funcDraw)
         end
     end)
@@ -156,18 +156,18 @@ do
     function spoly.Draw(id, x, y, w, h, color)
         local material = materials[id]
         if (not material) then return end
-    
+
         if (color) then
             SetDrawColor(color)
         end
-    
+
         SetMaterial(material)
-        
+
         PushFilterMag(TEXFILTER.ANISOTROPIC)
         PushFilterMin(TEXFILTER.ANISOTROPIC)
-    
+
         DrawTexturedRect(x, y, w, h)
-    
+
         PopFilterMag()
         PopFilterMin()
     end
@@ -175,18 +175,18 @@ do
     function spoly.DrawRotated(id, x, y, w, h, rotation, color)
         local material = materials[id]
         if (not material) then return end
-    
+
         if (color) then
             SetDrawColor(color)
         end
-    
+
         SetMaterial(material)
-        
+
         PushFilterMag(TEXFILTER.ANISOTROPIC)
         PushFilterMin(TEXFILTER.ANISOTROPIC)
-    
+
         DrawTexturedRectRotated(x, y, w, h, rotation)
-    
+
         PopFilterMag()
         PopFilterMin()
     end
