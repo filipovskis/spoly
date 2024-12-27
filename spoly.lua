@@ -134,6 +134,12 @@ do
         if (spoly.status == STATUS_IDLE and queue[1] and nextThink <= CurTime()) then
             nextThink = CurTime() + thinkRate
 
+            -- if game ui is visible, hide it, as render.Capture won't work if it's visible
+            if (gui.IsGameUIVisible()) then
+                gui.HideGameUI()
+                return
+            end
+
             local data = table.remove(queue, 1)
 
             spoly.Render(data.id, data.funcDraw)
