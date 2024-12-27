@@ -75,6 +75,7 @@ function spoly.Render(id, funcDraw)
 
     render.PushRenderTarget(RT)
 
+        render.SetWriteDepthToDestAlpha(false)
         render.Clear(0, 0, 0, 0)
 
         cam.Start2D()
