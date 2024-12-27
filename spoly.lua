@@ -69,28 +69,43 @@ Idk what shader parameter is missing, I couldn't find it even by comparing mater
 --------------------------------]]
 function spoly.Render(id, funcDraw)
     local path = 'spoly/' .. id .. '.png'
+    local tmpPath = SPOLY_DIR .. '/' .. util.SHA256(SysTime() .. path) .. '.png'
     local start = SysTime()
 
     spoly.status = STATUS_BUSY
 
     render.PushRenderTarget(RT)
-    
+
+        render.SetWriteDepthToDestAlpha(false)
         render.Clear(0, 0, 0, 0)
-        
+
         cam.Start2D()
             surface.SetDrawColor(color_white)
             draw.NoTexture()
             local success, errorText = pcall(funcDraw, SIZE, SIZE)
         cam.End2D()
 
-        local content = render.Capture(CAPTURE_DATA)
+        local capture_data = CAPTURE_DATA
+        if success and errorText then
+            capture_data = errorText
+        end
 
-        file.Delete(path)
-        file.Write(path, content)
-    
+        local content = render.Capture(capture_data)
+
+        file.Delete(tmpPath)
+        file.Write(tmpPath, content)
+
     render.PopRenderTarget()
 
-    materials[id] = Material('data/' .. path, 'mips')
+    -- gmod refuses to load the material from the file if it was an error before (till you disconnect/map changes)
+    -- so we use a temporary file to check if it's valid, this is only useful when your developing
+    materials[id] = Material('data/' .. tmpPath, 'mips')
+    if (materials[id]:IsError()) then
+        materials[id] = nil
+        file.Delete(tmpPath)
+    else
+        file.Rename(tmpPath, path)
+    end
 
     spoly.status = STATUS_IDLE
 
@@ -107,7 +122,7 @@ end
 function spoly.Generate(id, funcDraw)
     assert(isstring(id), Format('bad argument #1 to \'spoly.Generate\' (expected string, got %s)', type(id)))
     assert(isfunction(funcDraw), Format('bad argument #2 to \'spoly.Generate\' (expected function, got %s)', type(funcDraw)))
-    
+
     if (materials[id]) then return end
     if (queued[id]) then return end
 
@@ -133,9 +148,15 @@ do
     hook.Add('Think', 'spoly.QueueController', function()
         if (spoly.status == STATUS_IDLE and queue[1] and nextThink <= CurTime()) then
             nextThink = CurTime() + thinkRate
-    
+
+            -- if game ui is visible, hide it, as render.Capture won't work if it's visible
+            if (gui.IsGameUIVisible()) then
+                gui.HideGameUI()
+                return
+            end
+
             local data = table.remove(queue, 1)
-    
+
             spoly.Render(data.id, data.funcDraw)
         end
     end)
@@ -156,18 +177,18 @@ do
     function spoly.Draw(id, x, y, w, h, color)
         local material = materials[id]
         if (not material) then return end
-    
+
         if (color) then
             SetDrawColor(color)
         end
-    
+
         SetMaterial(material)
-        
+
         PushFilterMag(TEXFILTER.ANISOTROPIC)
         PushFilterMin(TEXFILTER.ANISOTROPIC)
-    
+
         DrawTexturedRect(x, y, w, h)
-    
+
         PopFilterMag()
         PopFilterMin()
     end
@@ -175,18 +196,18 @@ do
     function spoly.DrawRotated(id, x, y, w, h, rotation, color)
         local material = materials[id]
         if (not material) then return end
-    
+
         if (color) then
             SetDrawColor(color)
         end
-    
+
         SetMaterial(material)
-        
+
         PushFilterMag(TEXFILTER.ANISOTROPIC)
         PushFilterMin(TEXFILTER.ANISOTROPIC)
-    
+
         DrawTexturedRectRotated(x, y, w, h, rotation)
-    
+
         PopFilterMag()
         PopFilterMin()
     end
