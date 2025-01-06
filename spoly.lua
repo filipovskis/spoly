@@ -69,7 +69,7 @@ Idk what shader parameter is missing, I couldn't find it even by comparing mater
 --------------------------------]]
 function spoly.Render(id, funcDraw)
     local path = 'spoly/' .. id .. '.png'
-    local tmpPath = SPOLY_DIR .. '/' .. util.SHA256(SysTime() .. path) .. '.png'
+    local tmpPath = 'spoly/' .. util.SHA256(SysTime() .. path) .. '.png'
     local start = SysTime()
 
     spoly.status = STATUS_BUSY
